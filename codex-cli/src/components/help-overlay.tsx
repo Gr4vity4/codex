@@ -60,6 +60,9 @@ export default function HelpOverlay({
           <Text color="cyan">/diff</Text> – view working tree git diff
         </Text>
         <Text>
+          <Text color="cyan">/review-pr</Text> – review a GitHub pull request
+        </Text>
+        <Text>
           <Text color="cyan">/compact</Text> – condense context into a summary
         </Text>
 

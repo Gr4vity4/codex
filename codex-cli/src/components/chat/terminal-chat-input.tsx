@@ -640,6 +640,59 @@ export default function TerminalChatInput({
         }
 
         return;
+      } else if (inputValue.startsWith("/review-pr")) {
+        setInput("");
+
+        const match = inputValue.match(/\/review-pr\s+#?(\d+)/);
+        if (!match) {
+          setItems((prev) => [
+            ...prev,
+            {
+              id: `reviewpr-usage-${Date.now()}`,
+              type: "message",
+              role: "system",
+              content: [
+                {
+                  type: "input_text",
+                  text: "Usage: /review-pr #<number>",
+                },
+              ],
+            },
+          ]);
+          return;
+        }
+
+        try {
+          const { fetchPrDiff } = await import("../../utils/review-pr.js");
+          const diff = await fetchPrDiff(Number(match[1]));
+
+          setItems((prev) => [
+            ...prev,
+            {
+              id: `reviewpr-${Date.now()}`,
+              type: "message",
+              role: "system",
+              content: [{ type: "input_text", text: diff }],
+            },
+          ]);
+        } catch (error) {
+          setItems((prev) => [
+            ...prev,
+            {
+              id: `reviewpr-error-${Date.now()}`,
+              type: "message",
+              role: "system",
+              content: [
+                {
+                  type: "input_text",
+                  text: `⚠️ Failed to fetch PR: ${error}`,
+                },
+              ],
+            },
+          ]);
+        }
+
+        return;
       } else if (inputValue.startsWith("/")) {
         // Handle invalid/unrecognized commands. Only single-word inputs starting with '/'
         // (e.g., /command) that are not recognized are caught here. Any other input, including
